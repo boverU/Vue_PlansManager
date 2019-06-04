@@ -2,24 +2,25 @@
   <article class="post">
     <h1>ACTIVITY UPDATE</h1>
     <div class="activity-title">
-      <!-- TODO: Add v-model -->
-      <input v-model="activity.title" type="text" class="input">
       <i class="fas fa-cog activity-settings" @click="isMenuDisplayed = !isMenuDisplayed"/>
+      <input v-model="activityToUpdate.title" type="text" class="input">
     </div>
     <div class="activity-category">
-      <!-- TODO: add v-model and iterate categories in option  -->
-      <select v-model="activity.category" class="select">
+      <select v-model="activityToUpdate.category" class="select">
         <option disabled value>Please select one</option>
-        <!-- <option
+        <option
           v-for="category in categories"
           :key="category.id"
           :value="category.id"
-        >{{ category.text }}</option>-->
+        >{{ category.text }}</option>
       </select>
     </div>
     <div class="control activity-notes">
-      <!-- TODO: Add v-model here -->
-      <textarea v-model="activity.notes" class="textarea" placeholder="Write some notes here"/>
+      <textarea
+        v-model="activityToUpdate.notes"
+        class="textarea"
+        placeholder="Write some notes here"
+      />
     </div>
     <div class="media">
       <div class="media-left">
@@ -31,15 +32,14 @@
         <div class="content">
           <p>
             <a href="#">Filip Jerga</a>
-            updated {{ activity.updatedAt | prettyTime }} &nbsp;
+            updated {{ activityToUpdate.updatedAt | prettyTime }} &nbsp;
           </p>
         </div>
       </div>
       <div class="media-right">
-        <!-- TODO: Add v-model here -->
         <input
           id="progress"
-          v-model="activity.progress"
+          v-model="activityToUpdate.progress"
           type="range"
           name="progress"
           min="0"
@@ -47,13 +47,12 @@
           value="90"
           step="10"
         >
-        <label for="progress">{{ activity.progress }} %</label>
+        <label for="progress">{{ activityToUpdate.progress }} %</label>
       </div>
     </div>
     <div v-if="isMenuDisplayed" class="activity-controll">
-      <!-- TODO: create function 'updateActivity' to console log 'activity' -->
       <a class="button is-warning" @click="updateActivity">Commit Update</a>
-      <!-- TODO: Emit Event to Cancel Edit Mode -->
+
       <a class="button is-danger" @click="$emit('toggleUpdate', false)">Cancel</a>
     </div>
   </article>
@@ -61,10 +60,13 @@
 
 <script>
 import textUtility from "@/mixins/textUtility";
+import store from "@/store";
 export default {
   data() {
     return {
-      isControlOpen: false
+      isControlOpen: false,
+      isMenuDisplayed: true,
+      activityToUpdate: { ...this.activity }
     };
   },
   mixins: [textUtility],
@@ -77,6 +79,13 @@ export default {
       type: Object,
       required: true
     }
+  },
+  methods: {
+    updateActivity() {
+      store.updateActivity(this.activityToUpdate).then(() => {
+        this.$emit("toggleUpdate", false);
+      });
+    }
   }
 };
 </script>
@@ -87,8 +96,18 @@ export default {
 }
 
 .activity-title {
-  margin-bottom: 5px;
-  display: inline-block;
+  margin-bottom: 10px;
+  > i {
+    margin-bottom: 12px;
+  }
+}
+
+.activity-category {
+  margin-bottom: 10px;
+}
+
+.activity-notes {
+  margin-bottom: 10px;
 }
 
 .activity-settings {

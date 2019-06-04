@@ -1,5 +1,5 @@
 <template>
-  <div id="activityApp">
+  <div v-if="isDataLoaded" id="activityApp">
     <nav class="navbar is-white topNav">
       <div class="container">
         <div class="navbar-brand">
@@ -14,7 +14,7 @@
     <section class="container">
       <div class="columns">
         <div class="column is-3">
-          <ActivityCreate @activityCreated="addActivity" :categories="categories"></ActivityCreate>
+          <ActivityCreate :categories="categories"></ActivityCreate>
         </div>
 
         <div class="column is-9">
@@ -25,13 +25,12 @@
           >
             <div v-if="error">{{error}}</div>
             <div v-else>
-              <div v-if="isFetching && !isDataLoaded">Loading...</div>
+              <div v-if="isFetching ">Loading...</div>
               <ActivityItem
                 v-for="activity in activities"
                 :key="activity.id"
                 :activity="activity"
                 :categories="categories"
-                @activityDeleted="handleActivityDelete"
               />
             </div>
             <div v-if="!isFetching">
@@ -47,13 +46,14 @@
 
 <script>
 import vue from "vue";
-import {
-  fetchActivities,
-  fetchUser,
-  fetchCategories,
-  createActivity,
-  deleteActivityAPI
-} from "@/api";
+import store from "@/store";
+// import {
+//   fetchActivities,
+//   fetchUser,
+//   fetchCategories,
+//   createActivity,
+//   deleteActivityAPI
+// } from "@/api";
 import ActivityItem from "@/components/ActivityItem.vue";
 import ActivityCreate from "@/components/ActivityCreate";
 import TheNavBar from "@/components/TheNavBar";
@@ -61,6 +61,7 @@ export default {
   name: "App",
   components: { ActivityItem, ActivityCreate, TheNavBar },
   data: function() {
+    const { activities, categories } = store.state;
     return {
       creator: "Bover U",
       appName: "Activity Planner",
@@ -69,8 +70,8 @@ export default {
       isFetching: false,
       error: null,
       user: {},
-      activities: null,
-      categories: null
+      activities,
+      categories
     };
   },
   computed: {
@@ -87,8 +88,14 @@ export default {
         return "I hope you will determine your activities soon";
       }
     },
+    activitiesLength() {
+      return Object.keys(this.activities).length;
+    },
+    categoriesLength() {
+      return Object.keys(this.categories).length;
+    },
     isDataLoaded() {
-      return this.activities && this.categories;
+      return this.activitiesLength && this.categoriesLength;
     }
   },
   watch: {
@@ -105,30 +112,20 @@ export default {
   },
   created() {
     this.isFetching = true;
-    fetchActivities()
+    store
+      .fetchActivities()
       .then(activities => {
         this.isFetching = false;
-        this.activities = activities;
       })
       .catch(err => {
         this.error = err;
         this.isFetching = false;
       });
-    this.user = fetchUser();
-    fetchCategories().then(categories => (this.categories = categories));
+    this.user = store.fetchUser();
+    store.fetchCategories().then(categories => {});
   },
 
-  methods: {
-    addActivity(newActivity) {
-      vue.set(this.activities, newActivity.id, newActivity);
-      console.log(this.activities);
-    },
-    handleActivityDelete(activity) {
-      deleteActivityAPI(activity).then(deletedActivity => {
-        vue.delete(this.activities, deletedActivity.id);
-      });
-    }
-  }
+  methods: {}
 };
 </script>
 

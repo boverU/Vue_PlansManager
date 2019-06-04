@@ -1,6 +1,6 @@
 <template>
   <article class="post">
-    <div class="activity-title-wrapper">
+    <div class="activity-title">
       <h4 class="activity-title">{{ activity.title }}</h4>
       <i class="fas fa-cog activity-settings" @click="handleOpenControl"/>
     </div>
@@ -39,6 +39,7 @@
 
 <script>
 import textUtility from "@/mixins/textUtility";
+import store from "@/store";
 export default {
   name: "ActivityItem",
   data() {
@@ -74,7 +75,7 @@ export default {
       this.isControlOpen = !this.isControlOpen;
     },
     deleteActivity() {
-      this.$emit("activityDeleted", this.activity);
+      store.deleteActivity(this.activity);
     }
   }
 };
@@ -87,7 +88,7 @@ export default {
 
 .activity-title {
   margin-bottom: 5px;
-  display: inline-block;
+  display: block;
 }
 
 .activity-settings {

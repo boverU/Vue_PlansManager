@@ -53,6 +53,7 @@
 
 <script>
 import { createActivityAPI } from "@/api";
+import store from "@/store";
 export default {
   data() {
     return {
@@ -65,13 +66,10 @@ export default {
       this.isFormDisplayed = !this.isFormDisplayed;
     },
     createActivity() {
-      createActivityAPI({ ...this.newActivity })
-        .then(activity => {
-          this.$emit("activityCreated", { ...activity });
-          this.resetActivity();
-          this.isFormDisplayed = false;
-        })
-        .catch(e => alert(e));
+      store.createActivity({ ...this.newActivity }).then(activity => {
+        this.resetActivity();
+        this.isFormDisplayed = false;
+      });
     },
     resetActivity() {
       this.newActivity.title = "";

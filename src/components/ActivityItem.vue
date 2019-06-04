@@ -1,6 +1,11 @@
 <template>
   <div>
-    <ActivityItemUpdate v-if="isUpdateActive" :activity="activity" :categories="categories"/>
+    <ActivityItemUpdate
+      v-if="isUpdateActive"
+      :activity="activity"
+      :categories="categories"
+      @toggleUpdate="toggleUpdateState"
+    />
     <ActivityItemDetail
       v-else
       :activity="activity"
@@ -32,11 +37,8 @@ export default {
     };
   },
   methods: {
-    toggleUpdateState(isUpdate) {
-      debugger;
-      this.isUpdateActive = isUpdate;
-
-      console.log(isUpdateActive);
+    toggleUpdateState(state) {
+      this.isUpdateActive = state;
     }
   }
 };
